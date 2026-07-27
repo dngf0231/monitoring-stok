@@ -16,7 +16,6 @@ Stock ATK adalah aplikasi inventaris sederhana berbasis Laravel 12 untuk mengelo
 
 - PHP 8.2 atau lebih baru.
 - Composer.
-- Node.js dan npm.
 - MySQL/MariaDB.
 - Web server lokal seperti Laragon, atau `php artisan serve`.
 
@@ -28,13 +27,7 @@ Stock ATK adalah aplikasi inventaris sederhana berbasis Laravel 12 untuk mengelo
 composer install
 ```
 
-2. Install dependency frontend.
-
-```bash
-npm install
-```
-
-3. Buat file environment.
+2. Buat file environment.
 
 ```bash
 cp .env.example .env
@@ -46,13 +39,13 @@ Untuk Windows PowerShell:
 Copy-Item .env.example .env
 ```
 
-4. Generate application key.
+3. Generate application key.
 
 ```bash
 php artisan key:generate
 ```
 
-5. Buat database MySQL, default pada `.env.example`:
+4. Buat database MySQL, default pada `.env.example`:
 
 ```text
 DB_DATABASE=mystock
@@ -62,25 +55,13 @@ DB_PASSWORD=
 
 Sesuaikan nilai tersebut jika database lokal berbeda.
 
-6. Jalankan migrasi dan seeder.
+5. Jalankan migrasi dan seeder.
 
 ```bash
 php artisan migrate --seed
 ```
 
-7. Build asset frontend.
-
-```bash
-npm run build
-```
-
-Untuk development dengan Vite:
-
-```bash
-npm run dev
-```
-
-8. Jalankan aplikasi.
+6. Jalankan aplikasi.
 
 Jika memakai Laragon, arahkan virtual host ke folder project dan buka:
 
@@ -95,6 +76,8 @@ php artisan serve
 ```
 
 Lalu buka URL yang muncul di terminal.
+
+Catatan: template saat ini memakai CDN untuk Tailwind, Bootstrap, Font Awesome, dan SweetAlert, jadi tidak perlu `npm install` atau build asset frontend untuk menjalankan aplikasi.
 
 ## Akun Seeder
 

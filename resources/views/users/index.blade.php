@@ -91,7 +91,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p>Apakah Anda yakin ingin menghapus pengguna <strong>{{ $userName }}</strong>?</p>
+                <p>Apakah Anda yakin ingin menghapus pengguna <strong id="userName"></strong>?</p>
                 <div class="alert alert-warning">
                     <i class="fas fa-exclamation-triangle"></i>
                     <strong>Perhatian:</strong>
@@ -111,6 +111,11 @@
     </div>
 </div>
 
+<form id="deleteUserForm" method="POST" class="d-none">
+    @csrf
+    @method('DELETE')
+</form>
+
 <script>
     let userIdToDelete = null;
 
@@ -122,7 +127,8 @@
 
     function confirmDeleteAction() {
         if (userIdToDelete) {
-            window.location.href = "{{ route('users.destroy', ':id') }}".replace(':id', userIdToDelete);
+            document.getElementById('deleteUserForm').action = "{{ route('users.destroy', ':id') }}".replace(':id', userIdToDelete);
+            document.getElementById('deleteUserForm').submit();
         }
     }
 </script>
