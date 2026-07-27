@@ -1,0 +1,261 @@
+{
+  "info": {
+    "name": "Stock ATK API",
+    "description": "Koleksi API Stock ATK. Jalankan Login Admin/User untuk mengisi variable token otomatis.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://atk-test.test/api" },
+    { "key": "token", "value": "" },
+    { "key": "barang_id", "value": "1" },
+    { "key": "barang_keluar_id", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register - Menunggu Approval Admin",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Demo API User\",\n  \"email\": \"demo-api@example.com\",\n  \"password\": \"password\",\n  \"password_confirmation\": \"password\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/register", "host": ["{{base_url}}"], "path": ["register"] }
+          }
+        },
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.access_token) { pm.collectionVariables.set('token', json.access_token); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"password\",\n  \"device_name\": \"postman-admin\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/login", "host": ["{{base_url}}"], "path": ["login"] }
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.access_token) { pm.collectionVariables.set('token', json.access_token); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Accept", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password\",\n  \"device_name\": \"postman-user\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/login", "host": ["{{base_url}}"], "path": ["login"] }
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/me", "host": ["{{base_url}}"], "path": ["me"] }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/logout", "host": ["{{base_url}}"], "path": ["logout"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Data Barang",
+      "item": [
+        {
+          "name": "List Barang",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/barang?per_page=10", "host": ["{{base_url}}"], "path": ["barang"], "query": [{ "key": "per_page", "value": "10" }] }
+          }
+        },
+        {
+          "name": "Detail Barang",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/barang/{{barang_id}}", "host": ["{{base_url}}"], "path": ["barang", "{{barang_id}}"] }
+          }
+        },
+        {
+          "name": "Tambah Barang",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kode\": \"ATK-API-001\",\n  \"nama\": \"Barang API\",\n  \"stok\": 10\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/barang", "host": ["{{base_url}}"], "path": ["barang"] }
+          }
+        },
+        {
+          "name": "Update Barang",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"kode\": \"ATK-API-001\",\n  \"nama\": \"Barang API Update\",\n  \"stok\": 15\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/barang/{{barang_id}}", "host": ["{{base_url}}"], "path": ["barang", "{{barang_id}}"] }
+          }
+        },
+        {
+          "name": "Hapus Barang",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/barang/{{barang_id}}", "host": ["{{base_url}}"], "path": ["barang", "{{barang_id}}"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Barang Masuk",
+      "item": [
+        {
+          "name": "List Barang Masuk",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/barang-masuk?per_page=10", "host": ["{{base_url}}"], "path": ["barang-masuk"], "query": [{ "key": "per_page", "value": "10" }] }
+          }
+        },
+        {
+          "name": "Tambah Barang Masuk",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"barang_id\": 1,\n  \"jumlah\": 5,\n  \"tanggal\": \"2026-07-27\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/barang-masuk", "host": ["{{base_url}}"], "path": ["barang-masuk"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Barang Keluar",
+      "item": [
+        {
+          "name": "List Barang Keluar",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/barang-keluar?per_page=10", "host": ["{{base_url}}"], "path": ["barang-keluar"], "query": [{ "key": "per_page", "value": "10" }] }
+          }
+        },
+        {
+          "name": "Ajukan Barang Keluar",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"barang_id\": 1,\n  \"jumlah\": 2,\n  \"tanggal\": \"2026-07-27\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": { "raw": "{{base_url}}/barang-keluar", "host": ["{{base_url}}"], "path": ["barang-keluar"] }
+          }
+        },
+        {
+          "name": "Approve Barang Keluar",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/barang-keluar/{{barang_keluar_id}}/approve", "host": ["{{base_url}}"], "path": ["barang-keluar", "{{barang_keluar_id}}", "approve"] }
+          }
+        },
+        {
+          "name": "Reject Barang Keluar",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": { "raw": "{{base_url}}/barang-keluar/{{barang_keluar_id}}/reject", "host": ["{{base_url}}"], "path": ["barang-keluar", "{{barang_keluar_id}}", "reject"] }
+          }
+        }
+      ]
+    }
+  ]
+}

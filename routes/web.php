@@ -28,6 +28,8 @@ Route::get('/', function () {
     return view('home', compact('stok_terbanyak', 'stok_terendah', 'total_jenis'));
 });
 
+Route::view('/api-docs', 'api-docs')->name('api.docs');
+
 /*
 |--------------------------------------------------------------------------
 | Protected Routes (Harus Login)

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,9 +8,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; scroll-behavior: smooth; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            scroll-behavior: smooth;
+        }
     </style>
 </head>
+
 <body class="bg-white text-slate-900">
 
     {{-- NAVIGASI --}}
@@ -21,22 +26,25 @@
             </div>
 
             <div class="flex items-center gap-6">
+                <a href="{{ route('api.docs') }}" class="text-sm font-bold text-slate-600 hover:text-blue-600 transition">
+                    Docs API
+                </a>
                 @if (Route::has('login'))
-                    @auth
-                        <a href="{{ url('/dashboard') }}" class="px-6 py-2 bg-slate-900 text-white rounded-full text-sm font-bold hover:bg-slate-800 transition">
-                           Buka Panel Dashboard
-                        </a>
-                    @else
-                        <a href="{{ route('login') }}" class="text-sm font-bold text-slate-600 hover:text-blue-600 transition">
-                            Masuk
-                        </a>
-                        @if (Route::has('register'))
-                            <a href="{{ route('register') }}" 
-                               class="px-6 py-2.5 bg-blue-600 text-white rounded-full text-sm font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200">
-                               Daftar Akun
-                            </a>
-                        @endif
-                    @endauth
+                @auth
+                <a href="{{ url('/dashboard') }}" class="px-6 py-2 bg-slate-900 text-white rounded-full text-sm font-bold hover:bg-slate-800 transition">
+                    Buka Panel Dashboard
+                </a>
+                @else
+                <a href="{{ route('login') }}" class="text-sm font-bold text-slate-600 hover:text-blue-600 transition">
+                    Masuk
+                </a>
+                @if (Route::has('register'))
+                <a href="{{ route('register') }}"
+                    class="px-6 py-2.5 bg-blue-600 text-white rounded-full text-sm font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200">
+                    Daftar Akun
+                </a>
+                @endif
+                @endauth
                 @endif
             </div>
         </div>
@@ -55,7 +63,7 @@
                 <p class="text-lg text-slate-500 mb-10 leading-relaxed max-w-lg">
                     Monitoring stok barang masuk dan keluar secara akurat. Dirancang khusus untuk mempermudah operasional kantor Anda setiap hari.
                 </p>
-                
+
                 <div class="flex items-center gap-8 mb-10 border-l-4 border-blue-600 pl-6">
                     <div>
                         <p class="text-4xl font-extrabold text-slate-900">{{ $total_jenis }}</p>
@@ -70,12 +78,15 @@
 
                 <div class="flex flex-wrap gap-4">
                     @auth
-                        <a href="{{ url('/dashboard') }}" class="px-8 py-4 bg-slate-900 text-white rounded-2xl font-bold hover:scale-105 transition-transform shadow-xl">
-                            Kembali ke Dashboard
-                        </a>
+                    <a href="{{ url('/dashboard') }}" class="px-8 py-4 bg-slate-900 text-white rounded-2xl font-bold hover:scale-105 transition-transform shadow-xl">
+                        Kembali ke Dashboard
+                    </a>
                     @else
                         <a href="{{ route('login') }}" class="px-8 py-4 bg-blue-600 text-white rounded-2xl font-bold hover:scale-105 transition-transform shadow-xl shadow-blue-200">
                             Mulai Kelola Stok
+                        </a>
+                        <a href="{{ route('api.docs') }}" class="px-8 py-4 bg-white text-blue-600 border border-blue-100 rounded-2xl font-bold hover:scale-105 transition-transform shadow-lg">
+                            Docs API
                         </a>
                     @endauth
                 </div>
@@ -119,9 +130,10 @@
 
     <footer class="py-12 border-t border-slate-100">
         <div class="max-w-7xl mx-auto px-6 text-center text-slate-500 text-sm">
-            <p>&copy; 2025 Warehouse Solution. Build with Laravel.</p>
+            <p>&copy; {{ date('Y') }} Warehouse Solution. Build with Laravel.</p>
         </div>
     </footer>
 
 </body>
+
 </html>
