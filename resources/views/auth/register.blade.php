@@ -71,17 +71,8 @@
                    focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary" />
         </div>
 
-        <div>
-          <label class="block text-sm text-gray-700 mb-1 font-medium">
-            Level Pengguna
-          </label>
-          <select name="role" required
-            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm
-                   focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary bg-white">
-            <option value="" disabled selected>Pilih Level...</option>
-            <option value="user">User (Staf/Pemohon)</option>
-            <option value="admin">Admin (Pengelola Stok)</option>
-          </select>
+        <div class="rounded-lg bg-blue-50 text-blue-700 text-sm px-4 py-3">
+          Akun baru akan berstatus inactive dan perlu diaktifkan oleh admin sebelum bisa login.
         </div>
 
         <div>

@@ -13,8 +13,52 @@ class BarangMasukController extends Controller
     {
         return view('barang_masuk.index', [
             'barang' => Barang::all(),
-            // Mengurutkan agar data terbaru muncul di atas
-            'data' => BarangMasuk::with('barang')->latest()->get()
+        ]);
+    }
+
+    public function datatable(Request $request)
+    {
+        $columns = ['barang.nama', 'jumlah', 'tanggal', 'created_at'];
+        $query = BarangMasuk::query()->with('barang')->select('barang_masuk.*');
+        $recordsTotal = BarangMasuk::count();
+        $search = $request->input('search.value');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('jumlah', 'like', "%{$search}%")
+                    ->orWhere('tanggal', 'like', "%{$search}%")
+                    ->orWhereHas('barang', function ($barang) use ($search) {
+                        $barang->where('nama', 'like', "%{$search}%")
+                            ->orWhere('kode', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $recordsFiltered = $query->count();
+        $orderIndex = (int) $request->input('order.0.column', 3);
+        $orderDir = $request->input('order.0.dir') === 'asc' ? 'asc' : 'desc';
+
+        if (($columns[$orderIndex] ?? '') === 'barang.nama') {
+            $query->join('barang', 'barang.id', '=', 'barang_masuk.barang_id')->orderBy('barang.nama', $orderDir);
+        } else {
+            $query->orderBy($columns[$orderIndex] ?? 'created_at', $orderDir);
+        }
+
+        $rows = $query->skip((int) $request->input('start', 0))
+            ->take((int) $request->input('length', 10))
+            ->get()
+            ->map(fn (BarangMasuk $item) => [
+                'barang' => '<span class="fw-bold">' . e($item->barang->nama) . '</span><br><small class="text-muted">Kode: ' . e($item->barang->kode) . '</small>',
+                'jumlah' => '<span class="badge bg-success">+' . $item->jumlah . '</span>',
+                'tanggal' => \Carbon\Carbon::parse($item->tanggal)->format('d M Y'),
+                'waktu' => $item->created_at->diffForHumans(),
+            ]);
+
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $rows,
         ]);
     }
 

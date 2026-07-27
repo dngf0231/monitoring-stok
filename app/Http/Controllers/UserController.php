@@ -14,8 +14,78 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::with('role')->orderBy('name')->get();
-        return view('users.index', compact('users'));
+        return view('users.index');
+    }
+
+    public function datatable(Request $request)
+    {
+        $columns = ['id', 'name', 'email', 'role', 'status'];
+        $query = User::query();
+        $recordsTotal = $query->count();
+        $search = $request->input('search.value');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('role', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%");
+            });
+        }
+
+        $recordsFiltered = $query->count();
+        $orderIndex = (int) $request->input('order.0.column', 1);
+        $orderDir = $request->input('order.0.dir') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($columns[$orderIndex] ?? 'name', $orderDir);
+
+        $rows = $query->skip((int) $request->input('start', 0))
+            ->take((int) $request->input('length', 10))
+            ->get()
+            ->map(function (User $user) {
+                $actions = '';
+
+                if (auth()->user()->can('view', $user)) {
+                    $actions .= '<a href="' . route('users.show', $user) . '" class="btn btn-sm btn-info text-white"><i class="fas fa-eye"></i></a> ';
+                }
+
+                if (auth()->user()->can('update', $user)) {
+                    $actions .= '<a href="' . route('users.edit', $user) . '" class="btn btn-sm btn-warning text-white"><i class="fas fa-edit"></i></a> ';
+                }
+
+                if (auth()->user()->can('delete', $user)) {
+                    $actions .= '<button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete(' . $user->id . ', \'' . e($user->name) . '\')"><i class="fas fa-trash"></i></button>';
+                }
+
+                $statusClass = $user->status === User::STATUS_ACTIVE ? 'bg-success' : 'bg-secondary';
+                $statusLabel = $user->status === User::STATUS_ACTIVE ? 'Active' : 'Inactive';
+                $toggleLabel = $user->status === User::STATUS_ACTIVE ? 'Nonaktifkan' : 'Aktifkan';
+                $toggleClass = $user->status === User::STATUS_ACTIVE ? 'btn-outline-secondary' : 'btn-outline-success';
+                $status = '<span class="badge ' . $statusClass . '">' . $statusLabel . '</span>';
+
+                if (auth()->user()->can('update', $user) && auth()->id() !== $user->id) {
+                    $status .= '
+                        <form action="' . route('users.status', $user) . '" method="POST" class="d-inline ms-2">
+                            ' . csrf_field() . method_field('PATCH') . '
+                            <button class="btn btn-sm ' . $toggleClass . '">' . $toggleLabel . '</button>
+                        </form>';
+                }
+
+                return [
+                    'id' => $user->id,
+                    'name' => '<div class="d-flex align-items-center"><div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; min-width: 32px;">' . e(strtoupper(substr($user->name, 0, 1))) . '</div><span class="ms-2">' . e($user->name) . '</span></div>',
+                    'email' => e($user->email),
+                    'role' => '<span class="badge ' . ($user->role === 'admin' ? 'bg-danger' : 'bg-success') . '">' . e($user->role) . '</span>',
+                    'status' => $status,
+                    'aksi' => '<div class="text-end">' . $actions . '</div>',
+                ];
+            });
+
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $rows,
+        ]);
     }
 
     /**
@@ -37,6 +107,7 @@ class UserController extends Controller
             'email' => 'required|string|email|max:255|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'role' => 'required|string|exists:roles,name',
+            'status' => 'required|in:active,inactive',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
@@ -81,6 +152,7 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'role' => 'nullable|string|exists:roles,name',
+            'status' => 'required|in:active,inactive',
             'password' => 'nullable|string|min:8|confirmed',
         ]);
 
@@ -95,6 +167,21 @@ class UserController extends Controller
         $user->update($validated);
 
         flash_success('User berhasil diperbarui!');
+        return redirect()->route('users.index');
+    }
+
+    public function updateStatus(User $user)
+    {
+        if ($user->id === auth()->id()) {
+            flash_error('Tidak dapat mengubah status akun Anda sendiri!');
+            return redirect()->route('users.index');
+        }
+
+        $user->update([
+            'status' => $user->status === User::STATUS_ACTIVE ? User::STATUS_INACTIVE : User::STATUS_ACTIVE,
+        ]);
+
+        flash_success('Status akun berhasil diperbarui!');
         return redirect()->route('users.index');
     }
 

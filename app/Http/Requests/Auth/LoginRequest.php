@@ -49,6 +49,15 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        if (! $this->user()->isActive()) {
+            Auth::guard('web')->logout();
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => 'Akun Anda belum aktif. Silakan tunggu aktivasi dari admin.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

@@ -9,11 +9,10 @@
         <p class="text-muted">Kelola daftar stok barang ATK Anda di sini.</p>
     </div>
     <div class="bg-white px-4 py-2 rounded-lg shadow-sm border border-slate-200 text-sm font-medium">
-        📅 {{ date('d M Y') }}
+        <i class="fa-regular fa-calendar-days"></i> {{ date('d M Y') }}
     </div>
 </div>
 
-{{-- FORM TAMBAH BARANG: Hanya muncul untuk Admin --}}
 @if(auth()->user()->role == 'admin')
 <div class="mb-4 bg-white p-4 rounded-lg shadow-sm border border-slate-200">
     <h5 class="font-bold mb-3 text-slate-700">Tambah Barang Baru</h5>
@@ -45,61 +44,26 @@
 </div>
 @endif
 
-{{-- TABEL DATA --}}
 <div class="card shadow-sm">
     <div class="card-header bg-white">
         <h5 class="card-title mb-0">Daftar Barang</h5>
     </div>
     <div class="card-body">
-        @if($data->count() > 0)
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table id="barangTable" class="table table-hover align-middle w-100">
                 <thead class="table-light">
                     <tr>
-                        <th scope="col">Kode</th>
-                        <th scope="col">Nama Barang</th>
-                        <th scope="col">Stok Tersedia</th>
-                        <th scope="col" class="text-end">Aksi</th>
+                        <th>Kode</th>
+                        <th>Nama Barang</th>
+                        <th>Stok Tersedia</th>
+                        <th class="text-end">Aksi</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @foreach($data as $b)
-                    <tr>
-                        <td class="fw-bold text-primary">{{ $b->kode }}</td>
-                        <td class="fw-medium">{{ $b->nama }}</td>
-                        <td>
-                            <span class="badge {{ $b->stok <= 5 ? 'bg-danger' : 'bg-success' }}">
-                                {{ $b->stok }} Unit
-                            </span>
-                        </td>
-                        <td class="text-end">
-                            @if(auth()->user()->role == 'admin')
-                            <button onclick="openEditModal('{{ $b->id }}', '{{ $b->kode }}', '{{ $b->nama }}', '{{ $b->stok }}')" class="btn btn-sm btn-info text-white">
-                                <i class="fas fa-edit"></i> Edit
-                            </button>
-                            <button onclick="confirmDelete('{{ $b->id }}')" class="btn btn-sm btn-danger">
-                                <i class="fas fa-trash"></i> Hapus
-                            </button>
-                            @else
-                            <span class="text-muted text-xs">Hanya Lihat</span>
-                            @endif
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
             </table>
         </div>
-        @else
-        <div class="text-center py-5">
-            <i class="fas fa-box fa-3x text-muted mb-3"></i>
-            <p class="text-muted">Belum ada data barang</p>
-        </div>
-        @endif
     </div>
 </div>
-@endsection
 
-{{-- MODAL EDIT --}}
 <div class="modal fade" id="editModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -109,7 +73,8 @@
             </div>
             <div class="modal-body">
                 <form id="editForm" method="POST">
-                    @csrf @method('PUT')
+                    @csrf
+                    @method('PUT')
                     <div class="mb-3">
                         <label for="edit_kode" class="form-label">Kode Barang</label>
                         <input type="text" id="edit_kode" name="kode" class="form-control" required>
@@ -132,8 +97,27 @@
     </div>
 </div>
 
+<form id="deleteBarangForm" method="POST" class="d-none">
+    @csrf
+    @method('DELETE')
+</form>
+@endsection
+
+@push('scripts')
 <script>
     let currentEditId = null;
+
+    $('#barangTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "{{ route('barang.datatable') }}",
+        columns: [
+            { data: 'kode', name: 'kode' },
+            { data: 'nama', name: 'nama' },
+            { data: 'stok', name: 'stok' },
+            { data: 'aksi', name: 'aksi', orderable: false, searchable: false }
+        ]
+    });
 
     function openEditModal(id, kode, nama, stok) {
         currentEditId = id;
@@ -153,7 +137,7 @@
     function confirmDelete(id) {
         Swal.fire({
             title: 'Hapus Barang?',
-            text: "Data ini tidak bisa dikembalikan!",
+            text: 'Data ini tidak bisa dikembalikan!',
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#dc3545',
@@ -162,8 +146,10 @@
             cancelButtonText: 'Batal'
         }).then((result) => {
             if (result.isConfirmed) {
-                document.getElementById(`delete-form-${id}`).submit();
+                document.getElementById('deleteBarangForm').action = `/barang/${id}`;
+                document.getElementById('deleteBarangForm').submit();
             }
         });
     }
 </script>
+@endpush

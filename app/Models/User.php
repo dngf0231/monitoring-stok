@@ -20,7 +20,11 @@ class User extends Authenticatable
         'email',
         'password',
         'role', // Tambahkan ini agar role bisa disimpan ke database
+        'status',
     ];
+
+    public const STATUS_ACTIVE = 'active';
+    public const STATUS_INACTIVE = 'inactive';
 
     /**
      * The attributes that should be hidden for serialization.
@@ -69,5 +73,10 @@ class User extends Authenticatable
         }
 
         return (bool) $this->role()->first()?->hasPermission($permission);
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === self::STATUS_ACTIVE;
     }
 }

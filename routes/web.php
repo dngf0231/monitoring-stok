@@ -46,15 +46,22 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [\App\Http\Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // 2. BARANG (Lengkap: Index, Store, Update, Destroy)
+    Route::get('barang/datatable', [BarangController::class, 'datatable'])->name('barang.datatable');
     Route::resource('barang', BarangController::class);
 
     // 3. BARANG MASUK (Hanya Admin)
+    Route::get('barang_masuk/datatable', [BarangMasukController::class, 'datatable'])->name('barang_masuk.datatable')->middleware('admin');
     Route::resource('barang_masuk', BarangMasukController::class)->middleware('admin');
 
     // 4. BARANG KELUAR (User mengajukan, Admin approve/reject)
+    Route::get('barang_keluar/datatable', [BarangKeluarController::class, 'datatable'])->name('barang_keluar.datatable');
     Route::resource('barang_keluar', BarangKeluarController::class);
 
     // 6. ROLE MANAJEMEN (Hanya Admin)
+    Route::get('roles/datatable', [\App\Http\Controllers\RoleController::class, 'datatable'])
+        ->name('roles.datatable')
+        ->middleware('can:view,App\Models\Role');
+
     Route::resource('roles', \App\Http\Controllers\RoleController::class)
         ->middlewareFor(['index'], 'can:view,App\Models\Role')
         ->middlewareFor(['show'], 'can:view,role')
@@ -63,6 +70,13 @@ Route::middleware(['auth'])->group(function () {
         ->middlewareFor(['destroy'], 'can:delete,role');
 
     // 7. USER MANAJEMEN (Hanya Admin)
+    Route::get('users/datatable', [\App\Http\Controllers\UserController::class, 'datatable'])
+        ->name('users.datatable')
+        ->middleware('can:view,App\Models\User');
+    Route::patch('users/{user}/status', [\App\Http\Controllers\UserController::class, 'updateStatus'])
+        ->name('users.status')
+        ->middleware('can:update,user');
+
     Route::resource('users', \App\Http\Controllers\UserController::class)
         ->middlewareFor(['index'], 'can:view,App\Models\User')
         ->middlewareFor(['show'], 'can:view,user')

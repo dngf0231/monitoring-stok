@@ -12,8 +12,61 @@ class RoleController extends Controller
      */
     public function index()
     {
-        $roles = Role::orderBy('name')->get();
-        return view('roles.index', compact('roles'));
+        return view('roles.index');
+    }
+
+    public function datatable(Request $request)
+    {
+        $columns = ['id', 'name', 'description'];
+        $query = Role::query()->withCount('users');
+        $recordsTotal = Role::count();
+        $search = $request->input('search.value');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                    ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        $recordsFiltered = $query->count();
+        $orderIndex = (int) $request->input('order.0.column', 1);
+        $orderDir = $request->input('order.0.dir') === 'asc' ? 'asc' : 'desc';
+        $query->orderBy($columns[$orderIndex] ?? 'name', $orderDir);
+
+        $rows = $query->skip((int) $request->input('start', 0))
+            ->take((int) $request->input('length', 10))
+            ->get()
+            ->map(function (Role $role) {
+                $actions = '';
+
+                if (auth()->user()->can('view', $role)) {
+                    $actions .= '<a href="' . route('roles.show', $role) . '" class="btn btn-sm btn-info text-white"><i class="fas fa-eye"></i></a> ';
+                }
+
+                if (auth()->user()->can('update', $role)) {
+                    $actions .= '<a href="' . route('roles.edit', $role) . '" class="btn btn-sm btn-warning text-white"><i class="fas fa-edit"></i></a> ';
+                }
+
+                if (auth()->user()->can('delete', $role)) {
+                    $actions .= '<button type="button" class="btn btn-sm btn-danger" onclick="confirmDelete(' . $role->id . ', \'' . e($role->name) . '\')"><i class="fas fa-trash"></i></button>';
+                }
+
+                return [
+                    'id' => $role->id,
+                    'name' => '<span class="badge ' . ($role->name === 'admin' ? 'bg-danger' : 'bg-success') . '">' . e($role->name) . '</span>',
+                    'description' => e($role->description ?? '-'),
+                    'users' => '<span class="badge ' . ($role->users_count > 0 ? 'bg-info' : 'bg-secondary') . '">' . $role->users_count . ' Pengguna</span>',
+                    'aksi' => '<div class="text-end">' . $actions . '</div>',
+                ];
+            });
+
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $rows,
+        ]);
     }
 
     /**

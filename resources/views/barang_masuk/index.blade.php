@@ -9,11 +9,10 @@
         <p class="text-muted">Catat penambahan stok barang yang masuk ke gudang.</p>
     </div>
     <div class="bg-white px-4 py-2 rounded-lg shadow-sm border border-slate-200 text-sm font-medium">
-        📅 {{ date('d M Y') }}
+        <i class="fa-regular fa-calendar-days"></i> {{ date('d M Y') }}
     </div>
 </div>
 
-{{-- FORM INPUT BARANG MASUK --}}
 <div class="mb-4 bg-white p-4 rounded-lg shadow-sm border border-slate-200">
     <h5 class="font-bold mb-3">Form Input Stok Baru</h5>
     <form action="{{ route('barang_masuk.store') }}" method="POST">
@@ -43,53 +42,40 @@
     </form>
 </div>
 
-{{-- TABEL RIWAYAT --}}
 <div class="card shadow-sm">
     <div class="card-header bg-white">
         <h5 class="card-title mb-0">Riwayat Barang Masuk</h5>
     </div>
     <div class="card-body">
-        @if($data->count() > 0)
         <div class="table-responsive">
-            <table class="table table-hover align-middle">
+            <table id="barangMasukTable" class="table table-hover align-middle w-100">
                 <thead class="table-light">
                     <tr>
-                        <th scope="col">Nama Barang</th>
-                        <th scope="col">Jumlah</th>
-                        <th scope="col">Tanggal</th>
-                        <th scope="col">Waktu Input</th>
+                        <th>Nama Barang</th>
+                        <th>Jumlah</th>
+                        <th>Tanggal</th>
+                        <th>Waktu Input</th>
                     </tr>
                 </thead>
-                <tbody>
-                    @foreach($data as $d)
-                    <tr>
-                        <td>
-                            <div>
-                                <span class="fw-bold">{{ $d->barang->nama }}</span>
-                                <br>
-                                <small class="text-muted">Kode: {{ $d->barang->kode }}</small>
-                            </div>
-                        </td>
-                        <td>
-                            <span class="badge bg-success">
-                                +{{ $d->jumlah }}
-                            </span>
-                        </td>
-                        <td>{{ \Carbon\Carbon::parse($d->tanggal)->format('d M Y') }}</td>
-                        <td class="text-muted small">
-                            {{ $d->created_at->diffForHumans() }}
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
             </table>
         </div>
-        @else
-        <div class="text-center py-5">
-            <i class="fas fa-truck fa-3x text-muted mb-3"></i>
-            <p class="text-muted">Belum ada riwayat transaksi barang masuk.</p>
-        </div>
-        @endif
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    $('#barangMasukTable').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: "{{ route('barang_masuk.datatable') }}",
+        columns: [
+            { data: 'barang', name: 'barang' },
+            { data: 'jumlah', name: 'jumlah' },
+            { data: 'tanggal', name: 'tanggal' },
+            { data: 'waktu', name: 'waktu' }
+        ],
+        order: [[3, 'desc']]
+    });
+</script>
+@endpush

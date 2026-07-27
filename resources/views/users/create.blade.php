@@ -59,6 +59,19 @@
                 </div>
             </div>
 
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="status" class="form-label">Status Akun <span class="text-danger">*</span></label>
+                    <select class="form-select" id="status" name="status" required>
+                        <option value="active" {{ old('status', 'active') === 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="inactive" {{ old('status') === 'inactive' ? 'selected' : '' }}>Inactive</option>
+                    </select>
+                    <div class="form-text">
+                        User hanya bisa login jika status akun Active.
+                    </div>
+                </div>
+            </div>
+
             <hr>
 
             <h6 class="mb-3">Keamanan</h6>

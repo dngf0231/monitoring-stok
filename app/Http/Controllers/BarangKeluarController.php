@@ -14,7 +14,69 @@ class BarangKeluarController extends Controller
     {
         return view('barang_keluar.index', [
             'barang' => Barang::all(),
-            'data'   => BarangKeluar::with('barang', 'user')->latest()->get()
+        ]);
+    }
+
+    public function datatable(Request $request)
+    {
+        $columns = ['barang.nama', 'jumlah', 'tanggal', 'status'];
+        $query = BarangKeluar::query()->with('barang', 'user')->select('barang_keluar.*');
+        $recordsTotal = BarangKeluar::count();
+        $search = $request->input('search.value');
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('jumlah', 'like', "%{$search}%")
+                    ->orWhere('tanggal', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%")
+                    ->orWhereHas('barang', fn ($barang) => $barang->where('nama', 'like', "%{$search}%"));
+            });
+        }
+
+        $recordsFiltered = $query->count();
+        $orderIndex = (int) $request->input('order.0.column', 2);
+        $orderDir = $request->input('order.0.dir') === 'asc' ? 'asc' : 'desc';
+
+        if (($columns[$orderIndex] ?? '') === 'barang.nama') {
+            $query->join('barang', 'barang.id', '=', 'barang_keluar.barang_id')->orderBy('barang.nama', $orderDir);
+        } else {
+            $query->orderBy($columns[$orderIndex] ?? 'tanggal', $orderDir);
+        }
+
+        $rows = $query->skip((int) $request->input('start', 0))
+            ->take((int) $request->input('length', 10))
+            ->get()
+            ->map(function (BarangKeluar $item) {
+                $status = match ($item->status) {
+                    'approved' => '<span class="badge bg-success"><i class="fas fa-check"></i> Approved</span>',
+                    'rejected' => '<span class="badge bg-danger"><i class="fas fa-times"></i> Rejected</span>',
+                    default => '<span class="badge bg-warning text-dark"><i class="fas fa-clock"></i> Pending</span>',
+                };
+
+                $actions = '';
+                if (auth()->user()->role === 'admin') {
+                    $actions = $item->status === 'pending'
+                        ? '<div class="d-flex justify-content-center gap-2">
+                            <form action="' . route('barang_keluar.approve', $item->id) . '" method="POST">' . csrf_field() . '<button class="btn btn-sm btn-success"><i class="fas fa-check"></i> Approve</button></form>
+                            <form action="' . route('barang_keluar.reject', $item->id) . '" method="POST">' . csrf_field() . '<button class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Reject</button></form>
+                        </div>'
+                        : '<span class="text-muted small">Selesai</span>';
+                }
+
+                return [
+                    'barang' => '<span class="fw-bold">' . e($item->barang->nama) . '</span><br><small class="text-muted">ID Transaksi: #OUT-' . $item->id . '</small>',
+                    'jumlah' => '<span class="fw-bold">' . $item->jumlah . '</span>',
+                    'tanggal' => \Carbon\Carbon::parse($item->tanggal)->format('d M Y'),
+                    'status' => $status,
+                    'aksi' => $actions,
+                ];
+            });
+
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $rows,
         ]);
     }
 
