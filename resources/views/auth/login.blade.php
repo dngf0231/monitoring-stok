@@ -60,6 +60,14 @@
         Silakan login menggunakan akun yang sudah terdaftar.
       </p>
 
+      <div class="mb-5 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+        <p class="font-semibold mb-2">Akun Demo</p>
+        <div class="space-y-1">
+          <p><span class="font-medium">Admin:</span> admin@example.com / password</p>
+          <p><span class="font-medium">User:</span> user@example.com / password</p>
+        </div>
+      </div>
+
       <!-- Alert -->
       @if (session('success'))
         <div class="mb-4 rounded-lg bg-green-100 text-green-700 text-sm px-4 py-2">

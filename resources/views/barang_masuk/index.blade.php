@@ -28,8 +28,8 @@
                 </select>
             </div>
             <div class="col-md-4 mb-3">
-                <label for="jumlah" class="form-label">Jumlah Masuk</label>
-                <input type="number" class="form-control" id="jumlah" name="jumlah" placeholder="Contoh: 50" required>
+                <label for="jumlah" class="form-label">Jumlah Masuk <span class="text-danger">*</span> hanya angka saja</label>
+                <input type="number" class="form-control only-whole-number" id="jumlah" name="jumlah" placeholder="Contoh: 50" min="1" step="1" inputmode="numeric" required>
             </div>
             <div class="col-md-4 mb-3">
                 <label for="tanggal" class="form-label">Tanggal Masuk</label>

@@ -28,8 +28,8 @@
                 <input type="text" class="form-control" id="nama" name="nama" placeholder="Nama Barang" required>
             </div>
             <div class="col-md-4 mb-3">
-                <label for="stok" class="form-label">Stok Awal</label>
-                <input type="number" class="form-control" id="stok" name="stok" placeholder="Jumlah" required>
+                <label for="stok" class="form-label">Stok Awal <span class="text-danger">*</span> hanya angka saja</label>
+                <input type="number" class="form-control only-whole-number" id="stok" name="stok" placeholder="Jumlah" min="0" step="1" inputmode="numeric" required>
             </div>
         </div>
         <button type="submit" class="btn btn-primary">
@@ -84,8 +84,8 @@
                         <input type="text" id="edit_nama" name="nama" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label for="edit_stok" class="form-label">Stok</label>
-                        <input type="number" id="edit_stok" name="stok" class="form-control" required>
+                        <label for="edit_stok" class="form-label">Stok <span class="text-danger">*</span> hanya angka saja</label>
+                        <input type="number" id="edit_stok" name="stok" class="form-control only-whole-number" min="0" step="1" inputmode="numeric" required>
                     </div>
                 </form>
             </div>

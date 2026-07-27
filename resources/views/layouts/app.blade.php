@@ -155,6 +155,45 @@
         function toggleMobileSidebar() {
             document.getElementById('mobileSidebar').classList.toggle('hidden');
         }
+
+        document.addEventListener('input', function (event) {
+            if (!event.target.classList.contains('only-whole-number')) {
+                return;
+            }
+
+            const input = event.target;
+            const min = Number(input.getAttribute('min') || 0);
+            const value = input.value;
+            const isValid = /^\d+$/.test(value) && Number(value) >= min;
+
+            if (value !== '' && !isValid) {
+                input.value = value.replace(/[^\d]/g, '');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Input tidak valid',
+                    text: 'Kolom ini hanya menerima angka bulat positif. Minus dan desimal tidak diperbolehkan.',
+                    timer: 2200,
+                    showConfirmButton: false
+                });
+            }
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (!event.target.classList.contains('only-whole-number')) {
+                return;
+            }
+
+            if (['-', '+', '.', ',', 'e', 'E'].includes(event.key)) {
+                event.preventDefault();
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Hanya angka saja',
+                    text: 'Minus dan desimal tidak diperbolehkan.',
+                    timer: 1800,
+                    showConfirmButton: false
+                });
+            }
+        });
     </script>
     @stack('scripts')
 </body>
