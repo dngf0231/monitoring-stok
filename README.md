@@ -282,6 +282,16 @@ php artisan route:list --path=api
 php artisan view:clear
 ```
 
+## Deploy Apache/Cloud Server
+
+Rekomendasi terbaik untuk Laravel adalah mengarahkan document root domain ke folder:
+
+```text
+public
+```
+
+Jika hosting tidak menyediakan pengaturan document root ke `public`, project ini sudah menyediakan `.htaccess` di root untuk meneruskan request ke `public/index.php`. File `public/.htaccess` tetap dipakai untuk rewrite route Laravel dan menjaga header `Authorization` agar API Bearer Token berjalan.
+
 ## Testing
 
 ```bash
