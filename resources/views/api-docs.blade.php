@@ -23,6 +23,7 @@
         <div class="mb-8">
             <h1 class="text-4xl font-extrabold mb-3">Dokumentasi API Stock ATK</h1>
             <p class="text-slate-600">Base URL lokal: <code class="bg-white px-2 py-1 rounded border">{{ url('/api') }}</code></p>
+            <p class="text-slate-600 mt-2">Repository akses: <a href="https://github.com/danajoo01/monitoring-stok" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-bold hover:underline">danajoo01/monitoring-stok</a></p>
             <a href="https://documenter.getpostman.com/view/18717448/2sBY4Qu1PD" target="_blank" rel="noopener noreferrer" class="inline-flex mt-4 px-5 py-3 rounded-xl bg-orange-500 text-white font-bold hover:bg-orange-600">
                 Buka Dokumentasi Postman Online
             </a>

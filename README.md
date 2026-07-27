@@ -2,6 +2,8 @@
 
 Stock ATK adalah aplikasi inventaris ATK berbasis Laravel 12 untuk mengelola stok barang, transaksi barang masuk, pengajuan barang keluar, pengguna, role akses dinamis, dan API integrasi.
 
+Repository: [danajoo01/monitoring-stok](https://github.com/danajoo01/monitoring-stok)
+
 ## Fitur
 
 - Dashboard monitoring stok.
