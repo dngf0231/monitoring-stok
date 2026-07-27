@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Barang;
 use App\Models\BarangKeluar;
+use App\Support\ActivityLogger;
 use Illuminate\Support\Facades\DB; // WAJIB ADA untuk DB::transaction
 
 class BarangKeluarController extends Controller
@@ -89,13 +90,14 @@ class BarangKeluarController extends Controller
             'tanggal'   => 'required|date',
         ]);
 
-        BarangKeluar::create([
+        $barangKeluar = BarangKeluar::create([
             'barang_id' => $request->barang_id,
             'jumlah'    => $request->jumlah,
             'tanggal'   => $request->tanggal,
             'user_id'   => auth()->id(),
             'status'    => 'pending'
         ]);
+        ActivityLogger::log('barang_keluar.created', $barangKeluar, 'Mengajukan barang keluar', ['after' => $barangKeluar->toArray()]);
 
         flash_success('Permintaan barang keluar dikirim');
         return back();
@@ -125,6 +127,10 @@ class BarangKeluarController extends Controller
             // 4. Kurangi stok dan update status secara bersamaan
             $barang->decrement('stok', $keluar->jumlah);
             $keluar->update(['status' => 'approved']);
+            ActivityLogger::log('barang_keluar.approved', $keluar, 'Menyetujui barang keluar dan mengurangi stok', [
+                'barang_id' => $barang->id,
+                'jumlah' => $keluar->jumlah,
+            ]);
 
             flash_success('Barang keluar disetujui dan stok dipotong.');
             return back();
@@ -142,6 +148,7 @@ class BarangKeluarController extends Controller
         }
 
         $keluar->update(['status' => 'rejected']);
+        ActivityLogger::log('barang_keluar.rejected', $keluar, 'Menolak barang keluar', ['id' => $keluar->id]);
         flash_info('Permintaan barang keluar ditolak.');
         return back();
     }

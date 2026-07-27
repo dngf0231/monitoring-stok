@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Barang;
 use App\Models\BarangMasuk;
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -32,6 +33,7 @@ class BarangMasukController extends Controller
         $barangMasuk = DB::transaction(function () use ($validated) {
             $barangMasuk = BarangMasuk::create($validated);
             Barang::whereKey($validated['barang_id'])->increment('stok', $validated['jumlah']);
+            ActivityLogger::log('api.barang_masuk.created', $barangMasuk, 'API mencatat barang masuk dan menambah stok', ['after' => $barangMasuk->toArray()]);
 
             return $barangMasuk->load('barang');
         });

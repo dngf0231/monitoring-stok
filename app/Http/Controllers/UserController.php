@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\Role;
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -112,7 +113,8 @@ class UserController extends Controller
 
         $validated['password'] = Hash::make($validated['password']);
 
-        User::create($validated);
+        $user = User::create($validated);
+        ActivityLogger::log('users.created', $user, 'Menambahkan pengguna', ['after' => $user->only(['id', 'name', 'email', 'role', 'status'])]);
 
         flash_success('User berhasil dibuat!');
         return redirect()->route('users.index');
@@ -164,7 +166,9 @@ class UserController extends Controller
             unset($validated['password_confirmation']);
         }
 
+        $before = $user->only(['id', 'name', 'email', 'role', 'status']);
         $user->update($validated);
+        ActivityLogger::log('users.updated', $user, 'Memperbarui pengguna', ['before' => $before, 'after' => $user->fresh()->only(['id', 'name', 'email', 'role', 'status'])]);
 
         flash_success('User berhasil diperbarui!');
         return redirect()->route('users.index');
@@ -177,9 +181,11 @@ class UserController extends Controller
             return redirect()->route('users.index');
         }
 
+        $before = $user->status;
         $user->update([
             'status' => $user->status === User::STATUS_ACTIVE ? User::STATUS_INACTIVE : User::STATUS_ACTIVE,
         ]);
+        ActivityLogger::log('users.status_updated', $user, 'Mengubah status akun pengguna', ['before' => $before, 'after' => $user->status]);
 
         flash_success('Status akun berhasil diperbarui!');
         return redirect()->route('users.index');
@@ -202,7 +208,9 @@ class UserController extends Controller
             return redirect()->route('users.index');
         }
 
+        $payload = $user->only(['id', 'name', 'email', 'role', 'status']);
         $user->delete();
+        ActivityLogger::log('users.deleted', $user, 'Menghapus pengguna', ['before' => $payload]);
 
         flash_success('User berhasil dihapus!');
         return redirect()->route('users.index');

@@ -80,6 +80,9 @@
             @can('view', \App\Models\Role::class)
             <a href="{{ route('roles.index') }}" class="app-sidebar-link {{ request()->routeIs('roles.*') ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-slate-100' }}"><i class="fa-solid fa-shield-halved"></i> Role Akses</a>
             @endcan
+            @can('view', \App\Models\ActivityLog::class)
+            <a href="{{ route('activity_logs.index') }}" class="app-sidebar-link {{ request()->routeIs('activity_logs.*') ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-slate-100' }}"><i class="fa-solid fa-clock-rotate-left"></i> Log Activity</a>
+            @endcan
         </nav>
         <div class="p-4 border-t border-slate-100">
             <form method="POST" action="{{ route('logout') }}">
@@ -113,6 +116,9 @@
                 @endcan
                 @can('view', \App\Models\Role::class)
                 <a href="{{ route('roles.index') }}" class="app-sidebar-link {{ request()->routeIs('roles.*') ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-slate-100' }}" onclick="toggleMobileSidebar()"><i class="fa-solid fa-shield-halved"></i> Role Akses</a>
+                @endcan
+                @can('view', \App\Models\ActivityLog::class)
+                <a href="{{ route('activity_logs.index') }}" class="app-sidebar-link {{ request()->routeIs('activity_logs.*') ? 'bg-blue-50 text-blue-600' : 'text-slate-600 hover:bg-slate-100' }}" onclick="toggleMobileSidebar()"><i class="fa-solid fa-clock-rotate-left"></i> Log Activity</a>
                 @endcan
             </nav>
             <div class="mt-6 pt-4 border-t border-slate-100">

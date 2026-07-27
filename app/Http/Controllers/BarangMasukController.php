@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Barang;
 use App\Models\BarangMasuk;
+use App\Support\ActivityLogger;
 use Illuminate\Support\Facades\DB; // Tambahkan ini
 
 class BarangMasukController extends Controller
@@ -75,12 +76,16 @@ class BarangMasukController extends Controller
 
         try {
             // 1. Simpan transaksi
-            BarangMasuk::create($request->all());
+            $barangMasuk = BarangMasuk::create($request->only(['barang_id', 'jumlah', 'tanggal']));
 
             // 2. Update stok barang
             $barang = Barang::findOrFail($request->barang_id);
             $barang->stok += $request->jumlah;
             $barang->save();
+            ActivityLogger::log('barang_masuk.created', $barangMasuk, 'Mencatat barang masuk dan menambah stok', [
+                'barang' => $barang->only(['id', 'kode', 'nama', 'stok']),
+                'jumlah' => (int) $request->jumlah,
+            ]);
 
             DB::commit(); // Simpan perubahan permanen
             flash_success('Stok berhasil ditambahkan!');

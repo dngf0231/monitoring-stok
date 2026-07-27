@@ -23,6 +23,9 @@
         <div class="mb-8">
             <h1 class="text-4xl font-extrabold mb-3">Dokumentasi API Stock ATK</h1>
             <p class="text-slate-600">Base URL lokal: <code class="bg-white px-2 py-1 rounded border">{{ url('/api') }}</code></p>
+            <a href="https://documenter.getpostman.com/view/18717448/2sBY4Qu1PD" target="_blank" rel="noopener noreferrer" class="inline-flex mt-4 px-5 py-3 rounded-xl bg-orange-500 text-white font-bold hover:bg-orange-600">
+                Buka Dokumentasi Postman Online
+            </a>
         </div>
 
         <section class="bg-white border rounded-2xl p-6 mb-6">
@@ -78,7 +81,8 @@
 
         <section class="bg-white border rounded-2xl p-6">
             <h2 class="text-2xl font-bold mb-3">Postman</h2>
-            <p class="text-slate-600">Import file <code class="bg-slate-100 px-2 py-1 rounded">postman_collection.json</code> dari root project. Request Login Admin akan menyimpan token otomatis ke variable collection.</p>
+            <p class="text-slate-600 mb-3">Import file <code class="bg-slate-100 px-2 py-1 rounded">postman_collection.json</code> dari root project. Request Login Admin akan menyimpan token otomatis ke variable collection.</p>
+            <p class="text-slate-600">Versi online bisa dibuka di <a href="https://documenter.getpostman.com/view/18717448/2sBY4Qu1PD" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-bold hover:underline">Postman Documenter</a>.</p>
         </section>
     </main>
 </body>

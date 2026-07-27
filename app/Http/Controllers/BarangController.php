@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Barang;
+use App\Support\ActivityLogger;
 
 class BarangController extends Controller
 {
@@ -77,7 +78,8 @@ class BarangController extends Controller
         ]);
 
         // 2. Gunakan $validated, jangan $r->all()
-        Barang::create($validated);
+        $barang = Barang::create($validated);
+        ActivityLogger::log('barang.created', $barang, 'Menambahkan data barang', ['after' => $barang->toArray()]);
 
         flash_success('Barang berhasil ditambahkan');
         return redirect()->route('barang.index');
@@ -92,7 +94,9 @@ class BarangController extends Controller
         ]);
 
         $barang = Barang::findOrFail($id);
+        $before = $barang->toArray();
         $barang->update($validated);
+        ActivityLogger::log('barang.updated', $barang, 'Memperbarui data barang', ['before' => $before, 'after' => $barang->fresh()->toArray()]);
 
         flash_success('Data barang berhasil diperbarui');
         return redirect()->back();
@@ -110,7 +114,9 @@ class BarangController extends Controller
                 return redirect()->back();
             }
 
+            $payload = $barang->toArray();
             $barang->delete();
+            ActivityLogger::log('barang.deleted', $barang, 'Menghapus data barang', ['before' => $payload]);
             flash_success('Barang berhasil dihapus');
             return redirect()->back();
 

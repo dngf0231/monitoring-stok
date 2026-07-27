@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\ApiToken;
 use App\Models\User;
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 
@@ -26,6 +28,7 @@ class AuthController extends Controller
             'role' => 'user',
             'status' => User::STATUS_INACTIVE,
         ]);
+        ActivityLogger::log('api.auth.registered', $user, 'Registrasi API menunggu aktivasi admin', ['status' => $user->status], $request);
 
         return response()->json([
             'message' => 'Registrasi berhasil. Akun menunggu aktivasi admin melalui web panel.',
@@ -62,6 +65,8 @@ class AuthController extends Controller
             'name' => $request->input('device_name', 'postman'),
             'token' => hash('sha256', $plainToken),
         ]);
+        Auth::setUser($user);
+        ActivityLogger::log('api.auth.login', $user, 'Login API berhasil', ['device_name' => $request->input('device_name', 'postman')], $request);
 
         return response()->json([
             'message' => 'Login berhasil.',
@@ -79,6 +84,7 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        ActivityLogger::log('api.auth.logout', $request->user(), 'Logout API', [], $request);
         ApiToken::where('token', hash('sha256', $request->bearerToken()))->delete();
 
         return response()->json(['message' => 'Logout berhasil.']);

@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Barang;
 use App\Models\BarangKeluar;
 use App\Models\BarangMasuk;
+use App\Models\ActivityLog;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
@@ -35,6 +36,7 @@ class AppServiceProvider extends ServiceProvider
             Barang::class => 'barang',
             BarangMasuk::class => 'barang_masuk',
             BarangKeluar::class => 'barang_keluar',
+            ActivityLog::class => 'activity_logs',
         ];
 
         foreach ($abilities as $model => $prefix) {

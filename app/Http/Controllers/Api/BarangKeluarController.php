@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Barang;
 use App\Models\BarangKeluar;
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -34,6 +35,7 @@ class BarangKeluarController extends Controller
             'user_id' => auth()->id(),
             'status' => 'pending',
         ])->load('barang', 'user');
+        ActivityLogger::log('api.barang_keluar.created', $barangKeluar, 'API mengajukan barang keluar', ['after' => $barangKeluar->toArray()], $request);
 
         return response()->json([
             'message' => 'Permintaan barang keluar dibuat dengan status pending dan menunggu approval admin.',
@@ -58,6 +60,10 @@ class BarangKeluarController extends Controller
 
             $barang->decrement('stok', $barangKeluar->jumlah);
             $barangKeluar->update(['status' => 'approved']);
+            ActivityLogger::log('api.barang_keluar.approved', $barangKeluar, 'API menyetujui barang keluar dan mengurangi stok', [
+                'barang_id' => $barang->id,
+                'jumlah' => $barangKeluar->jumlah,
+            ]);
 
             return response()->json(['message' => 'Barang keluar disetujui dan stok dipotong.', 'data' => $barangKeluar->fresh()->load('barang', 'user')]);
         });
@@ -72,6 +78,7 @@ class BarangKeluarController extends Controller
         }
 
         $barangKeluar->update(['status' => 'rejected']);
+        ActivityLogger::log('api.barang_keluar.rejected', $barangKeluar, 'API menolak barang keluar', ['id' => $barangKeluar->id]);
 
         return response()->json(['message' => 'Permintaan barang keluar ditolak.', 'data' => $barangKeluar->fresh()->load('barang', 'user')]);
     }

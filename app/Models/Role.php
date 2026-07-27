@@ -51,6 +51,9 @@ class Role extends Model
             'roles.update' => 'Edit role akses',
             'roles.delete' => 'Hapus role akses',
         ],
+        'Log Activity' => [
+            'activity_logs.view' => 'Lihat log activity',
+        ],
     ];
 
     /**

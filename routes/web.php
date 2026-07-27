@@ -86,6 +86,13 @@ Route::middleware(['auth'])->group(function () {
         ->middlewareFor(['edit', 'update'], 'can:update,user')
         ->middlewareFor(['destroy'], 'can:delete,user');
 
+    Route::get('activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index'])
+        ->name('activity_logs.index')
+        ->middleware('can:view,App\Models\ActivityLog');
+    Route::get('activity-logs/datatable', [\App\Http\Controllers\ActivityLogController::class, 'datatable'])
+        ->name('activity_logs.datatable')
+        ->middleware('can:view,App\Models\ActivityLog');
+
     // 8. KHUSUS ADMIN (Approve & Reject)
     Route::middleware('admin')->group(function () {
         Route::post('/barang_keluar/{id}/approve', [BarangKeluarController::class, 'approve'])

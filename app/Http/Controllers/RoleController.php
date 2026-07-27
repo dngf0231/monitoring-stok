@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Role;
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 
 class RoleController extends Controller
@@ -91,7 +92,8 @@ class RoleController extends Controller
         ]);
 
         $validated['permissions'] = $request->input('permissions', []);
-        Role::create($validated);
+        $role = Role::create($validated);
+        ActivityLogger::log('roles.created', $role, 'Menambahkan role akses', ['after' => $role->toArray()]);
 
         flash_success('Role berhasil dibuat!');
         return redirect()->route('roles.index');
@@ -127,7 +129,9 @@ class RoleController extends Controller
         ]);
 
         $validated['permissions'] = $request->input('permissions', []);
+        $before = $role->toArray();
         $role->update($validated);
+        ActivityLogger::log('roles.updated', $role, 'Memperbarui role akses', ['before' => $before, 'after' => $role->fresh()->toArray()]);
 
         flash_success('Role berhasil diperbarui!');
         return redirect()->route('roles.index');
@@ -150,7 +154,9 @@ class RoleController extends Controller
             return redirect()->route('roles.index');
         }
 
+        $payload = $role->toArray();
         $role->delete();
+        ActivityLogger::log('roles.deleted', $role, 'Menghapus role akses', ['before' => $payload]);
 
         flash_success('Role berhasil dihapus!');
         return redirect()->route('roles.index');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Barang;
+use App\Support\ActivityLogger;
 use Illuminate\Http\Request;
 
 class BarangController extends Controller
@@ -32,7 +33,10 @@ class BarangController extends Controller
             'stok' => ['required', 'integer', 'min:0'],
         ]);
 
-        return response()->json(['message' => 'Barang berhasil dibuat.', 'data' => Barang::create($validated)], 201);
+        $barang = Barang::create($validated);
+        ActivityLogger::log('api.barang.created', $barang, 'API menambahkan data barang', ['after' => $barang->toArray()], $request);
+
+        return response()->json(['message' => 'Barang berhasil dibuat.', 'data' => $barang], 201);
     }
 
     public function show(Barang $barang)
@@ -50,7 +54,9 @@ class BarangController extends Controller
             'stok' => ['required', 'integer', 'min:0'],
         ]);
 
+        $before = $barang->toArray();
         $barang->update($validated);
+        ActivityLogger::log('api.barang.updated', $barang, 'API memperbarui data barang', ['before' => $before, 'after' => $barang->fresh()->toArray()], $request);
 
         return response()->json(['message' => 'Barang berhasil diperbarui.', 'data' => $barang]);
     }
@@ -63,7 +69,9 @@ class BarangController extends Controller
             return response()->json(['message' => 'Barang tidak bisa dihapus karena sudah memiliki transaksi.'], 422);
         }
 
+        $payload = $barang->toArray();
         $barang->delete();
+        ActivityLogger::log('api.barang.deleted', $barang, 'API menghapus data barang', ['before' => $payload]);
 
         return response()->json(['message' => 'Barang berhasil dihapus.']);
     }

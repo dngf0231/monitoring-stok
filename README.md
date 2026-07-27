@@ -11,10 +11,12 @@ Stock ATK adalah aplikasi inventaris ATK berbasis Laravel 12 untuk mengelola sto
 - Manajemen pengguna dengan status akun `active` / `inactive`.
 - Registrasi user baru dengan status awal `inactive`, wajib diaktifkan admin melalui web panel.
 - Manajemen role akses dengan permission checklist dinamis.
+- Permission role berlaku untuk akses web panel dan route API yang membutuhkan otorisasi.
 - Tabel utama memakai DataTables server-side via CDN.
 - API Bearer Token untuk login, register, barang, barang masuk, dan barang keluar.
 - Dokumentasi API tersedia di halaman web.
 - Koleksi Postman siap import.
+- Log Activity untuk melihat aktivitas CRUD, auth, approval, dan penggunaan API.
 
 ## Kebutuhan Sistem
 
@@ -151,12 +153,34 @@ Untuk menambah permission baru:
 2. Tambahkan Gate atau pengecekan akses pada fitur terkait.
 3. Update seeder jika permission default role perlu ikut berubah.
 
+Permission pada menu Manajemen Role Akses juga dipakai oleh endpoint API. Contoh: role yang tidak memiliki `barang_masuk.create` tidak bisa membuat barang masuk lewat web ataupun `POST /api/barang-masuk`.
+
+## Log Activity
+
+Menu `Log Activity` menampilkan riwayat aktivitas project dari web panel dan API.
+
+Aktivitas yang dicatat meliputi:
+
+- Login, logout, dan register.
+- CRUD data barang.
+- Pencatatan barang masuk.
+- Pengajuan, approve, dan reject barang keluar.
+- CRUD pengguna dan perubahan status akun.
+- CRUD role akses.
+- Aktivitas endpoint API dengan channel `api`.
+
 ## API
 
 Dokumentasi API tersedia di:
 
 ```text
 http://atk-test.test/api-docs
+```
+
+Dokumentasi Postman online:
+
+```text
+https://documenter.getpostman.com/view/18717448/2sBY4Qu1PD
 ```
 
 Base URL API:
@@ -236,7 +260,13 @@ Cara pakai:
 Default variable:
 
 ```text
-base_url = http://atk-test.test/api
+base_url = http://{url}/api
+```
+
+Dokumentasi online Postman juga bisa dibuka melalui:
+
+```text
+https://documenter.getpostman.com/view/18717448/2sBY4Qu1PD
 ```
 
 ## Command Berguna
@@ -256,4 +286,4 @@ php artisan view:clear
 php artisan test
 ```
 
-Catatan lokal: test bawaan Laravel memakai SQLite in-memory. Pastikan ekstensi `pdo_sqlite` aktif di PHP jika ingin menjalankan test tersebut.
+Created by Danang Fathurrohman
